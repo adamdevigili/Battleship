@@ -61,9 +61,12 @@ def main():
     place_ships_phase = True
 
     carrier = Carrier()
+    pt = PTBoat()
+    destroyer = Destroyer()
+    battleship = Battleship()
+    submarine = Submarine()
 
-
-    ships_to_place = [carrier]
+    ships_to_place = [carrier, battleship, submarine, destroyer, pt]
     #Background music
     #pygame.mixer.music.play(-1)
 
@@ -96,10 +99,8 @@ def main():
     while True: #Main game loop
         mouseClicked = False
 
-        if not ships_to_place:  #If all ships have been placed
-            place_ships_phase = False
 
-        if place_ships_phase:
+        if ships_to_place:  #Placing ships phase
             current_ship = ships_to_place[0]
 
             for event in pygame.event.get():
@@ -109,7 +110,7 @@ def main():
                 elif event.type == MOUSEMOTION:
                     mousePos = event.pos
                 elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                    #ships_to_place.remove(current_ship)
+                    ships_to_place.remove(current_ship)
                     mousePos = event.pos
                     mouseClicked = True
 
@@ -204,16 +205,16 @@ class PTBoat(Ship):
         self.name="PT Boat"
         self.size=2
         self.hit_list = [0, 0]
-        self.orient = orient
-        self.loc = loc
+        #self.orient = orient
+        #self.loc = loc
 
 class Destroyer(Ship):
     def __init__(self):
         self.name="Destroyer"
         self.size=3
         self.hit_list = [0, 0, 0]
-        self.orient = orient
-        self.loc = loc
+        #self.orient = orient
+        #self.loc = loc
 
 class Submarine(Ship):
     def __init__(self):
