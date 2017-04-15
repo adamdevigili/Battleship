@@ -62,7 +62,8 @@ def main():
 
     carrier = Carrier()
 
-    ships_to_place = ["carrier", "battleship", "subarine", "destroyer", "ptboat"]
+
+    ships_to_place = [carrier]
     #Background music
     #pygame.mixer.music.play(-1)
 
@@ -70,7 +71,6 @@ def main():
 
     mousex = 0 # used to store x coordinate of mouse event
     mousey = 0 # used to store y coordinate of mouse event
-
 
     # 0 -> nothing in this square, WHITE
     # 1 -> player's ship in this square, GRAY
@@ -93,7 +93,7 @@ def main():
 
     pygame.draw.rect(screen, BLACK, (WINDOW_WIDTH/2, 0, 10, WINDOW_HEIGHT))     #Middle line
 
-    while True: # the main game loop
+    while True: #Main game loop
         mouseClicked = False
 
         if not ships_to_place:  #If all ships have been placed
@@ -101,7 +101,7 @@ def main():
 
         if place_ships_phase:
             current_ship = ships_to_place[0]
-            print current_ship
+
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -113,38 +113,36 @@ def main():
                     mousePos = event.pos
                     mouseClicked = True
 
-
             print mousePos
 
+            #Main player board
             for row in range(BOARD_WIDTH):
                 for column in range(BOARD_HEIGHT):
                     r = player_rect_board[row][column]
-                    if r.collidepoint(mousePos) and event.type == MOUSEBUTTONDOWN:
-                        #color = GRAY
-                        player_game_board[row][column] += 1
-                    #elif:
-                        #color = WHITE
-                    if player_game_board[row][column] == 0:
-                        color = WHITE
-                    elif player_game_board[row][column] == 1:
+                    if r.collidepoint(mousePos) and mouseClicked and player_game_board[row][column] != 1:
+                        coord_list = []
+                        coord_list.append([column, row])
+                        player_game_board[row][column] = 1
+                        for i in range(current_ship.size):
+                            player_game_board[row][column + i] = 1
+                            #coord_list.append([row][column + i])
+                        current_ship.loc = coord_list
+
+                    if player_game_board[row][column] == 1:
                         color = GRAY
-                    elif player_game_board[row][column] == 2:
-                        color = BLUE
-                    elif player_game_board[row][column] == 3:
-                        color = ORANGE
-                    elif player_game_board[row][column] == 4:
-                        color = RED
+                    else:
+                        color = WHITE
+
+                    print current_ship.name, current_ship.size, current_ship.loc
 
                     pygame.draw.rect(screen, color, r)
-
+            #Opponent board
             for row in range(BOARD_WIDTH):
                 for column in range(BOARD_HEIGHT):
                     r = opp_rect_board[row][column]
                     if r.collidepoint(mousePos) and event.type == MOUSEBUTTONDOWN:
-                        #color = GRAY
                         opp_game_board[row][column] += 1
-                    #elif:
-                        #color = WHITE
+
                     if opp_game_board[row][column] == 0:
                         color = WHITE
                     elif opp_game_board[row][column] == 1:
@@ -175,8 +173,7 @@ def main():
             if mouseClicked:
                 gun_sound.play()
 
-
-def place_ship(player_rect_board, ship):
+class PlayerGameBoard():
     pass
 
 class Tile:
@@ -184,7 +181,7 @@ class Tile:
     pos_y = None
 
 #Parent class for all ships
-class Ship(pygame.sprite.Sprite):
+class Ship():
     name = None
     size = None         #PT Boat = 2, Destroyer = 3, Submarine = 3, Battleship = 4, Carrier = 5
     orient = None       #up, down, left, right
@@ -195,8 +192,6 @@ class Ship(pygame.sprite.Sprite):
 
     def get_tiles(self):
         pass
-
-
 
     def check_alive():
         if 0 not in hit_list:   #every part of the ship was hit, therefore it is dead
@@ -225,23 +220,22 @@ class Submarine(Ship):
         self.name="Submarine"
         self.size=3
         self.hit_list = [0, 0, 0]
-        self.orient = orient
-        self.loc = loc
+        #self.orient = orient
+        #self.loc = loc
 
 class Battleship(Ship):
     def __init__(self):
         self.name="Battleship"
         self.size=4
         self.hit_list = [0, 0, 0, 0]
-        self.orient = orient
-        self.loc = loc
+        #self.orient = orient
+        #self.loc = loc
 
 class Carrier(Ship):
     def __init__(self):
         self.name="Aircraft Carrier"
         self.size=5
         self.hit_list = [0, 0, 0, 0, 0]
-        #self.orient = orient
         #self.loc = loc
 
 
