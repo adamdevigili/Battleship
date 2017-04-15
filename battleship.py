@@ -54,6 +54,8 @@ def main():
     global fpsClock, screen
     screen.fill(NAVY)
 
+    place_ships_phase = True
+    ships_to_place = ["carrier", "battleship", "subarine", "destroyer", "ptboat"]
     #Background music
     #pygame.mixer.music.play(-1)
 
@@ -76,31 +78,57 @@ def main():
     while True: # the main game loop
         mouseClicked = False
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == MOUSEMOTION:
-                mousePos = event.pos
-            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                mousePos = event.pos
-                mouseClicked = True
+        if not ships_to_place:  #If all ships have been placed
+            place_ships_phase = False
 
-        if mouseClicked:
-            gun_sound.play()
 
-        print mousePos
-        for row in range(BOARD_WIDTH):
-            for column in range(BOARD_HEIGHT):
-                r = player_rect_board[row][column]
-                if r.collidepoint(mousePos):
-                    color = RED
-                else:
-                    color = WHITE
-                pygame.draw.rect(screen, color, r)
 
-        pygame.display.update()
-        fpsClock.tick(FPS)
+        if place_ships_phase:
+            current_ship = ships_to_place[0]
+            print current_ship
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEMOTION:
+                    mousePos = event.pos
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    ships_to_place.remove(current_ship)
+                    mousePos = event.pos
+                    mouseClicked = True
+
+            if mouseClicked:
+                gun_sound.play()
+
+            print mousePos
+
+            for row in range(BOARD_WIDTH):
+                for column in range(BOARD_HEIGHT):
+                    r = player_rect_board[row][column]
+                    if r.collidepoint(mousePos):
+                        color = RED
+                    else:
+                        color = WHITE
+                    pygame.draw.rect(screen, color, r)
+
+            pygame.display.update()
+            fpsClock.tick(FPS)
+        else:
+            print "Now in play state"
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEMOTION:
+                    mousePos = event.pos
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    mousePos = event.pos
+                    mouseClicked = True
+
+
+
+def place_ship(player_rect_board, ship):
+    pass
 
 class Tile:
     pos_x = None
@@ -111,7 +139,14 @@ class Ship:
     orient = None
     loc = (None, None)
 
+    tile_list = []
     hit_list = []
+
+    def check_alive():
+        if 0 not in hit_list:   #every part was hit_list
+            return False
+        else:
+            return True
 
 class PTBoat(Ship):
     def __init__(self, orient, loc):
