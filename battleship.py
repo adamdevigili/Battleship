@@ -20,6 +20,8 @@ WINDOW_HEIGHT = 600
 BOARD_SIZE = 500
 BOARD_WIDTH = 10
 BOARD_HEIGHT = 10
+BOARD_START_X = 30
+BOARD_START_Y = 30
 
 SQUARE_SIZE = (BOARD_SIZE-(BOARD_SIZE/10))/10
 SPACING = SQUARE_SIZE/10
@@ -53,7 +55,7 @@ def main():
     screen.fill(NAVY)
 
     #Background music
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
 
     pygame.display.set_caption('Battleship')
 
@@ -63,7 +65,14 @@ def main():
     player_board = [[0 for x in range(BOARD_WIDTH)] for y in range(BOARD_HEIGHT)]
     opp_board = [[0 for x in range(BOARD_WIDTH)] for y in range(BOARD_HEIGHT)]
 
-    pygame.draw.rect(screen, BLACK, (0, 0, BOARD_SIZE, BOARD_SIZE))
+    player_rect_board = [[0 for x in range(BOARD_WIDTH)] for y in range(BOARD_HEIGHT)]
+    for row in range(BOARD_WIDTH):
+        for column in range(BOARD_HEIGHT):
+            player_rect_board[row][column] = Rect([(SPACING + SQUARE_SIZE) * column + SPACING, (SPACING + SQUARE_SIZE) * row + SPACING,SQUARE_SIZE, SQUARE_SIZE])
+
+    #pygame.draw.rect(screen, BLACK, (BOARD_START_X, BOARD_START_Y, BOARD_SIZE, BOARD_SIZE))
+    mousePos = (0, 0)
+
     while True: # the main game loop
         mouseClicked = False
 
@@ -72,26 +81,30 @@ def main():
                 pygame.quit()
                 sys.exit()
             elif event.type == MOUSEMOTION:
-                mousex, mousey = event.pos
-                print mousex, mousey
-            elif event.type == MOUSEBUTTONDOWN:
-                mousex, mousey = event.pos
+                mousePos = event.pos
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                mousePos = event.pos
                 mouseClicked = True
-                print mousex, mousey, "CLICK"
 
         if mouseClicked:
             gun_sound.play()
 
+        print mousePos
         for row in range(BOARD_WIDTH):
             for column in range(BOARD_HEIGHT):
-                color = WHITE
-                pygame.draw.rect(screen, color, [(SPACING + SQUARE_SIZE) * column + SPACING, (SPACING + SQUARE_SIZE) * row + SPACING,SQUARE_SIZE, SQUARE_SIZE])
+                r = player_rect_board[row][column]
+                if r.collidepoint(mousePos):
+                    color = RED
+                else:
+                    color = WHITE
+                pygame.draw.rect(screen, color, r)
 
         pygame.display.update()
         fpsClock.tick(FPS)
 
-
-
+class Tile:
+    pos_x = None
+    pos_y = None
 class Ship:
     name = None
     size = None #PT Boat = 2, Destroyer = 3, Submarine = 3, Battleship = 4, Carrier = 5
